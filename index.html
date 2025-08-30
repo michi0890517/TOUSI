@@ -156,12 +156,33 @@ function addMsg(role, html){
   const b=document.createElement('div'); b.className='bubble'; b.innerHTML=html; wrap.appendChild(b);
   msgs.appendChild(wrap); msgs.scrollTop=msgs.scrollHeight;
 }
+// ---- 置換パッチ：カテゴリ提案の判定を強化 ----
 function categoryAdvice(question){
   const {horizon,budget,risk}=PROF;
-  let beginner={idx:100,div:0,gro:0}, normal={idx:75,div:15,gro:10}, attack={idx:60,div:20,gro:20};
-  if(risk==='低'){ normal={idx:85,div:10,gro:5}; attack={idx:70,div:20,gro:10}; }
+
+  // 1) 文字正規化（全角→半角、句読点・空白除去）
+  const norm = (s)=>
+    s.normalize('NFKC')
+     .replace(/[！!？?\s]/g,'')
+     .toLowerCase();
+
+  const q = norm(question);
+
+  // 2) 意図判定（幅広い言い回しをカバー）
+  const isBeginner = /(初心者|はじめ|初めて|入門|何から|むずい|難しい|楽に|簡単に)/.test(q);
+  const isAttack   = /(攻め|強気|グロース|成長|リスク取|一発|倍|跳ね|テーマ)/.test(q);
+  const isDividend = /(配当|利回り|ディフェンシブ|守り|安定|高配当|インカム)/.test(q);
+
+  // 3) 配分プリセット（リスク・期間で微調整）
+  let beginner={idx:100,div:0,gro:0},
+      normal  ={idx:75, div:15,gro:10},
+      attack  ={idx:60, div:20,gro:20};
+
+  if(risk==='低'){ normal={idx:85,div:10,gro:5};  attack={idx:70,div:20,gro:10}; }
   if(risk==='高'){ normal={idx:65,div:10,gro:25}; attack={idx:50,div:15,gro:35}; }
-  if(horizon<3){ beginner={idx:100,div:0,gro:0}; normal={idx:90,div:10,gro:0}; attack={idx:80,div:20,gro:0}; }
+  if(horizon<3){  beginner={idx:100,div:0,gro:0}; normal={idx:90,div:10,gro:0}; attack={idx:80,div:20,gro:0}; }
+
+  const yen = n=>'¥'+Math.round(n).toLocaleString('ja-JP');
   const block=(title,p)=>`
     <div class="card" style="margin:8px 0;background:rgba(90,209,255,.04)">
       <div><b>${title}</b></div>
@@ -172,14 +193,28 @@ function categoryAdvice(question){
       </ul>
       <div class="small">買い方：毎月同額DCA。まとまって買うなら<b>3分割</b>。</div>
     </div>`;
+
   const pre = `<div class="small">前提: 期間<strong>${horizon}年</strong> / 月<strong>${yen(budget||0)}</strong> / リスク<strong>${risk}</strong></div><hr>`;
-  const q=question.toLowerCase();
-  if(/初心者|はじめ|何から/.test(q)) return pre+`<b>結論：</b>初心者は<b>インデックスETF</b>を軸に。`+block('初心者向け', beginner);
-  if(/攻め|リスク|グロース/.test(q)) return pre+`<b>結論：</b>攻めたいなら<b>グロースを20%前後</b>（入れすぎ注意）。`+block('攻め（値動きOK）', attack);
-  if(/配当|安定|守り/.test(q))   return pre+`<b>結論：</b>安定/配当重視。`+block('守り寄り', {idx:80,div:20,gro:0});
-  return pre+`<b>今日の結論（3パターン）：</b>`+block('初心者向け', beginner)+block('標準（ちょい攻め）', normal)+block('攻め（値動きOK）', attack)
-         +`<div class="small">※カテゴリ提案。銘柄指定や投資助言ではありません。</div>`;
+
+  // 4) 意図に応じて分岐
+  if(isBeginner){
+    return pre + `<b>結論：</b>初心者は<b>インデックスETF</b>を軸に。` + block('初心者向け', beginner);
+  }
+  if(isAttack){
+    return pre + `<b>結論：</b>攻めたいなら<b>グロースを20%前後</b>（入れすぎ注意）。` + block('攻め（値動きOK）', attack);
+  }
+  if(isDividend){
+    return pre + `<b>結論：</b>配当・安定重視。` + block('守り寄り（配当重視）', {idx:80,div:20,gro:0});
+  }
+
+  // 5) 該当なし → 3パターン提示
+  return pre + `<b>今日の結論（3パターン）：</b>`
+       + block('初心者向け', beginner)
+       + block('標準（ちょい攻め）', normal)
+       + block('攻め（値動きOK）', attack)
+       + `<div class="small">※カテゴリ提案。銘柄指定や投資助言ではありません。</div>`;
 }
+
 function send(text){ addMsg('me',text); setTimeout(()=>addMsg('sensei', categoryAdvice(text)), 120); }
 const inputEl=document.getElementById('chatInput'); let composing=false;
 inputEl.addEventListener('compositionstart',()=>composing=true);
