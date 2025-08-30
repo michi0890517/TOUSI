@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>師匠アプリ v1 — 投資チャット & シミュレーター</title>
+<title>師匠アプリ v1.1 — 投資チャット & シミュレーター</title>
 <link rel="manifest" href="manifest.webmanifest" />
 <meta name="theme-color" content="#0b0f14" />
 <style>
@@ -23,8 +23,7 @@ button{cursor:pointer;border:1px solid transparent;background:linear-gradient(90
 button.secondary{background:transparent;color:var(--text);border-color:var(--border)}
 .small{font-size:12px;color:var(--muted)} .tag{padding:2px 8px;border:1px solid var(--border);border-radius:999px;font-size:12px;color:var(--muted);display:inline-block}
 .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid var(--border)}
-summary{cursor:pointer}
-hr{border:0;border-top:1px dashed var(--border);margin:10px 0}
+summary{cursor:pointer} hr{border:0;border-top:1px dashed var(--border);margin:10px 0}
 
 /* Chat */
 .chat-wrap{display:grid;grid-template-rows:1fr auto;gap:10px;height:min(68vh,620px)}
@@ -39,7 +38,7 @@ hr{border:0;border-top:1px dashed var(--border);margin:10px 0}
 /* Charts */
 canvas{width:100%;height:260px;background:var(--soft);border:1px solid var(--border);border-radius:12px;display:block}
 
-/* Learn cards */
+/* Learn */
 .grid{display:grid;gap:12px;grid-template-columns:1fr} @media(min-width:880px){.grid{grid-template-columns:1fr 1fr}}
 
 /* Quiz */
@@ -49,7 +48,7 @@ canvas{width:100%;height:260px;background:var(--soft);border:1px solid var(--bor
 </head>
 <body>
 <header>
-  <h1>師匠アプリ v1 <span class="badge">投資チャット</span> <span class="badge">シミュレーター</span> <span class="badge">学習＆クイズ</span></h1>
+  <h1>師匠アプリ v1.1 <span class="badge">投資チャット</span> <span class="badge">シミュレーター</span> <span class="badge">学習＆クイズ</span></h1>
   <div class="sub">教育目的・一般情報。特定銘柄の推奨は行いません（重要情報は免責参照）。</div>
 </header>
 
@@ -75,7 +74,7 @@ canvas{width:100%;height:260px;background:var(--soft);border:1px solid var(--bor
           <button class="secondary q">不動産ってあり？</button>
         </div>
         <div class="row" style="margin-top:8px">
-          <input id="chatInput" placeholder="師匠に質問を書く（例：毎月1万円で何やれば？）" style="flex:1">
+          <input id="chatInput" placeholder="師匠に質問を書く（例：今2434を1万円買ってよい？）" style="flex:1">
           <button id="sendBtn">送信</button>
         </div>
         <div class="small">※ このアプリの回答は一般的情報であり、投資助言ではありません。自己責任でご判断ください。</div>
@@ -94,10 +93,8 @@ canvas{width:100%;height:260px;background:var(--soft);border:1px solid var(--bor
         <div><label>ボラティリティ(年, %)*</label><input id="volN" type="number" value="0"></div>
         <button id="runN" class="secondary">計算</button>
       </div>
-      <div class="small">*ボラ0=決定論。>0にすると乱数でざっくり分散（擬似）。</div>
-      <div class="row" style="margin-top:6px">
-        <div class="tag" id="outN"></div>
-      </div>
+      <div class="small">*ボラ0=決定論。>0は乱数でざっくり分散（擬似）。</div>
+      <div class="row" style="margin-top:6px"><div class="tag" id="outN"></div></div>
       <canvas id="chartN"></canvas>
     </div>
 
@@ -110,9 +107,7 @@ canvas{width:100%;height:260px;background:var(--soft);border:1px solid var(--bor
         <div><label>ボラティリティ(年, %)</label><input id="volC" type="number" value="60"></div>
         <button id="runC" class="secondary">計算</button>
       </div>
-      <div class="row" style="margin-top:6px">
-        <div class="tag" id="outC"></div>
-      </div>
+      <div class="row" style="margin-top:6px"><div class="tag" id="outC"></div></div>
       <canvas id="chartC"></canvas>
       <div class="small">注: クリプトは価格変動が極端に大きい資産。長期積立でも**少額・分散**が基本。</div>
     </div>
@@ -124,29 +119,29 @@ canvas{width:100%;height:260px;background:var(--soft);border:1px solid var(--bor
       <div class="card">
         <h3 style="margin:0 0 6px">NISAの考え方（超要約）</h3>
         <ul class="small">
-          <li>長期・分散・低コストの**インデックス**を軸に。</li>
-          <li>毎月一定額を**時間分散**（DCA）。</li>
-          <li>暴落時も**ルール継続**（売らない）。</li>
+          <li>長期・分散・低コストの<strong>インデックス</strong>を軸に。</li>
+          <li>毎月一定額を<strong>時間分散</strong>（DCA）。</li>
+          <li>暴落時も<strong>ルール継続</strong>（売らない）。</li>
         </ul>
         <details><summary>もう少し詳しく</summary>
-          <p class="small">・広い分散（全世界/先進国/国内などの指数）<br>・信託報酬が低いETF/投信<br>・税制が有利な枠（NISA）を優先活用</p>
+          <p class="small">・広い分散（全世界/先進国/国内など）<br>・信託報酬が低いETF/投信<br>・税制が有利な枠（NISA）を優先活用</p>
         </details>
       </div>
       <div class="card">
         <h3 style="margin:0 0 6px">リスク管理の鉄則</h3>
         <ul class="small">
-          <li>生活防衛資金（3〜6か月）を**別口**で確保。</li>
-          <li>ハイリスク資産（個別株/FX/仮想通貨）は**資産の一部だけ**。</li>
-          <li>レバレッジは**小さく・短期限定**。</li>
+          <li>生活防衛資金（3〜6か月）を<strong>別口</strong>で確保。</li>
+          <li>ハイリスク資産（個別株/FX/仮想通貨）は<strong>資産の一部だけ</strong>。</li>
+          <li>レバレッジは<strong>小さく・短期限定</strong>。</li>
         </ul>
       </div>
       <div class="card">
         <h3 style="margin:0 0 6px">インフレと複利</h3>
-        <p class="small">複利は「時間×再投資」。年5%を10年積み上げると、元本の**約1.63倍**。20年なら**約2.65倍**。</p>
+        <p class="small">複利は「時間×再投資」。年5%を10年積み上げると、元本の<strong>約1.63倍</strong>。20年なら<strong>約2.65倍</strong>。</p>
       </div>
       <div class="card">
         <h3 style="margin:0 0 6px">よくある落とし穴</h3>
-        <ul class="small"><li>短期の値動きで**やめる**</li><li>手数料の高い商品</li><li>集中投資（単一テーマ/銘柄）</li></ul>
+        <ul class="small"><li>短期の値動きで<strong>やめる</strong></li><li>手数料の高い商品</li><li>集中投資（単一テーマ/銘柄）</li></ul>
       </div>
     </div>
   </section>
@@ -221,137 +216,92 @@ function addMsg(role, text){
   msgs.appendChild(wrap);
   msgs.scrollTop = msgs.scrollHeight;
 }
-function adviceFor(input){
-  const q = input.toLowerCase();
-  const {age,horizon,budget,risk} = PROF;
-  const base = `<div class="small">前提: 期間<strong>${horizon}年</strong> / 月<strong>¥${(+budget).toLocaleString()}</strong> / リスク<strong>${risk}</strong></div><hr>`;
-  const rules = `<ul class="small"><li>生活防衛資金（3–6か月）を別口で確保</li><li>長期・分散・低コストを軸に（インデックス/DCA）</li><li>高ボラ資産は少額・上限パーセンテージを決める</li></ul>`;
 
-  if(q.includes('nisa') || q.includes('つみたて') || q.includes('積立')){
-    return base + `<b>方向性：</b>まずはNISA枠で<strong>広く分散されたインデックス</strong>を中心に、毎月の自動積立。<br>
-    ・配分例（参考）: 株式インデックス 80% / 債券や現金 20%（${risk==='高'?'株式多め':'中'===risk?'中庸':'安定重視'}）<br>
-    ・${horizon>=10?'長期有利。':'期間が短めなので価格変動に注意。'}<br>${rules}`;
+// —— ここが「結論を出す」ロジック —— //
+function adviceFor(input){
+  const q = input.replace(/\s+/g,'');
+  const {age,horizon,budget,risk} = PROF;
+
+  // 1) パース
+  const code = (q.match(/(\d{4})/)||[])[1] || (q.match(/btc|ビットコイン/i)?'BTC':null);
+  const wantBuy = /買|エントリ|entry/i.test(input);
+  const wantSell = /売|利確|手放/i.test(input);
+  const amtYen = (()=>{ const m = input.match(/([\d,]+)\s*円/); return m? parseInt(m[1].replace(/,/g,''),10): null; })();
+
+  // 2) ルール
+  const capPct = risk==='高'?0.6 : risk==='中'?0.4 : 0.25;
+  const perTry = Math.max(1000, Math.round((budget||0) * (capPct/3)));   // 3回に分ける
+  const stopPct = risk==='高'?0.12 : risk==='中'?0.10 : 0.08;
+
+  const verdict = {label:'TRY', color:'#ffd36e', why:[], plan:[]};
+
+  if(horizon < 3) verdict.why.push('投資期間が短い（<3年）→価格変動に弱い');
+  if((budget||0) < 5000) verdict.why.push('月の投資余力が小さい→無理のない配分が必要');
+  if(/fx|為替|レバ/i.test(input)) verdict.why.push('FX/レバは高リスク→少額短期に限定');
+  if(/仮想|ビット|btc/i.test(input)) verdict.why.push('仮想通貨は超高ボラ→DCA前提・上限割合厳守');
+  if(code && code!=='BTC') verdict.why.push('個別株は企業固有リスク→比率は小さく');
+
+  if(wantSell){
+    verdict.label='TRY'; verdict.color='#64f4a3';
+    verdict.why.unshift('利確/損切りは事前ルール通りに実行が基本');
+    verdict.plan.push('売りの根拠（目標到達/決算前/トレンド崩れ）を明文化');
+  } else if(wantBuy){
+    if(horizon>=5 && risk!=='低'){ verdict.label='GO'; verdict.color='#64f4a3'; }
+    else if(horizon<3 || risk==='低'){ verdict.label='PASS'; verdict.color='#ff6b6b'; }
   }
-  if(q.includes('個別') || q.includes('株')){
-    return base + `<b>個別株：</b>企業分析が必要。最初は<strong>全体の一部(例: 〜20%)</strong>に限定。<br>
-    ・分散（業種/地域）・手数料・税制を意識<br>・指数連動と併用でリスクを抑える<br>${rules}`;
+
+  if(wantBuy){
+    const base = amtYen || budget || 10000;
+    const trySize = Math.min(perTry, Math.round(base/3));
+    if(verdict.label==='GO' || verdict.label==='TRY'){
+      verdict.plan.push(`分割DCA：¥${trySize.toLocaleString()} × 3回（数日〜数週間）`);
+      verdict.plan.push(`逆指値：エントリーから -${Math.round(stopPct*100)}%（月間想定損失 ≒ ¥${Math.round(trySize*stopPct).toLocaleString()}）`);
+      verdict.plan.push('決算直前や急騰直後は見送り→落ち着いてから分割エントリー');
+    }else{
+      verdict.plan.push('今回は見送り。代替：NISAの広いインデックスへ振替');
+    }
   }
-  if(q.includes('fx') || q.includes('レバ') || q.includes('為替')){
-    return base + `<b>FX：</b>レバレッジと強制決済リスクがあり、<strong>短期・少額</strong>に限定が無難。スワップ/手数料・損切りルール必須。<br>${rules}`;
-  }
-  if(q.includes('ビット') || q.includes('btc') || q.includes('仮想')){
-    return base + `<b>仮想通貨：</b>期待リターンは高いが<strong>大きく上下</strong>。<br>
-    ・DCA（定額積立）/ 上限割合（例: 総資産の5–10%以内）<br>・長期で保有する覚悟と分散を。<br>${rules}`;
-  }
-  if(q.includes('不動産') || q.includes('賃貸') || q.includes('利回り')){
-    return base + `<b>不動産：</b>キャッシュフロー・金利・空室率・修繕費をシビアに試算。<br>
-    ・借入の固定/変動金利と返済比率を管理<br>・地域/物件タイプの分散も検討<br>${rules}`;
-  }
-  if(q.includes('ポート') || q.includes('配分') || q.includes('アロケ')){
-    const eq = risk==='高'?80:risk==='中'?60:40;
-    return base + `<b>配分のたたき台：</b>株式 ${eq}% / 安定資産 ${100-eq}%（期間${horizon}年）<br>
-    ・年1回のリバランスで比率を維持<br>${rules}`;
-  }
-  // デフォルト
-  return base + `状況を教えてくれたら、指針を出すで！<br>
-  ①目的（家・教育・老後 etc.）②期間（${horizon}年でOK？）③毎月の余力（今は¥${(+budget).toLocaleString()}）④経験・不安点<br>${rules}`;
+
+  const head = `<div class="small">前提: 期間<strong>${horizon}年</strong> / 月<strong>¥${(+budget).toLocaleString()}</strong> / リスク<strong>${risk}</strong>${code?` / 対象:<strong>${code}</strong>`:''}</div>`;
+  const badge = `<span class="badge" style="border-color:transparent;background:${verdict.color};color:#002018">${verdict.label}</span>`;
+  const why = verdict.why.length? `<ul class="small">`+verdict.why.map(x=>`<li>${x}</li>`).join('')+`</ul>` : '';
+  const plan = verdict.plan.length? `<ul class="small">`+verdict.plan.map(x=>`<li>${x}</li>`).join('')+`</ul>` : '';
+  const note = `<div class="small">※ 教育目的の一般情報。具体銘柄の推奨ではありません。最終判断は自己責任で。</div>`;
+  return `${head}<hr>結論：${badge}${why}${plan}${note}`;
 }
+
 function send(text){
   if(!text.trim()) return;
   addMsg('me', text);
   setTimeout(()=> addMsg('sensei', adviceFor(text)), 200);
 }
-document.getElementById('sendBtn').addEventListener('click', ()=> send(document.getElementById('chatInput').value));
-document.getElementById('chatInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){ send(e.target.value); e.target.value=''; }});
+document.getElementById('sendBtn').addEventListener('click', ()=>{
+  const el=document.getElementById('chatInput'); send(el.value); el.value='';
+});
+document.getElementById('chatInput').addEventListener('keydown', e=>{
+  if(e.key==='Enter'){ send(e.target.value); e.target.value=''; }
+});
 document.querySelectorAll('.q').forEach(b=> b.addEventListener('click',()=> send(b.textContent)));
-addMsg('sensei', 'ようラス！投資の疑問を投げてくれたら、一緒に考えるで。まずはプロフィールを「👤プロフィール」で軽く埋めるのがおすすめ。');
+addMsg('sensei', 'ようラス！投資の疑問を投げてくれたら、一緒に考えるで。まずは「👤プロフィール」を軽く埋めるのがおすすめ。');
 
 /* ========= Simulator ========= */
 function drawLine(canvas, series, labels){
   const ctx=canvas.getContext('2d'); const DPR=window.devicePixelRatio||1; const W=canvas.clientWidth, H=canvas.clientHeight;
   canvas.width=W*DPR; canvas.height=H*DPR; ctx.scale(DPR,DPR); ctx.clearRect(0,0,W,H);
   const pad=36; const maxY=Math.max(...series)*1.05||1; const minY=0;
-  // axes
   ctx.strokeStyle="#233043"; ctx.beginPath(); ctx.moveTo(pad,H-pad); ctx.lineTo(W-pad,H-pad); ctx.lineTo(W-pad,pad); ctx.stroke();
-  // grid
   ctx.fillStyle="#9fb3c8"; ctx.font="12px system-ui";
   for(let t=0;t<=4;t++){ const y=H-pad-(H-2*pad)*t/4; const val=Math.round(minY+(maxY-minY)*t/4);
     ctx.fillText(val.toLocaleString("ja-JP"),6,y+4); ctx.strokeStyle="#233043"; ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke(); }
-  // line
   ctx.beginPath(); series.forEach((v,i)=>{ const x=pad + (W-2*pad)*i/(series.length-1); const y=H-pad-(H-2*pad)*((v-minY)/(maxY-minY)); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
   ctx.strokeStyle="#7aa2ff"; ctx.lineWidth=2; ctx.stroke();
-  // labels (start/end)
-  ctx.fillStyle="#e8f0ff"; ctx.fillText(labels[0], pad, H-pad+16);
-  ctx.fillText(labels[labels.length-1], W-pad-60, H-pad+16);
+  ctx.fillStyle="#e8f0ff"; ctx.fillText(labels[0], pad, H-pad+16); ctx.fillText(labels[labels.length-1], W-pad-60, H-pad+16);
 }
-
 function runDCA(monthly, yrs, annual, vol=0){
   const N = Math.max(1, Math.round(yrs*12));
   const r_m = (annual/100)/12;
   const vol_m = (vol/100)/Math.sqrt(12);
   let v=0, arr=[];
   for(let i=1;i<=N;i++){
-    // ランダムリターン（lognormal近似）
     const drift = r_m - 0.5*vol_m*vol_m;
-    const shock = vol>0 ? Math.exp(drift + vol_m*randn()) : (1+r_m);
-    v = (v+monthly) * (vol>0 ? shock : (1+r_m));
-    arr.push(Math.round(v));
-  }
-  return arr;
-}
-function randn(){ // Box-Muller
-  let u=0,v=0; while(u===0) u=Math.random(); while(v===0) v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
-}
-function fmtMoney(y){ return "¥"+Math.round(y).toLocaleString("ja-JP"); }
-
-document.getElementById('runN').addEventListener('click', ()=>{
-  const m=+document.getElementById('pmtN').value||0;
-  const r=+document.getElementById('retN').value||0;
-  const y=+document.getElementById('yrsN').value||0;
-  const vol=+document.getElementById('volN').value||0;
-  const arr = runDCA(m,y,r,vol);
-  const total = m * Math.round(y*12);
-  const last = arr[arr.length-1]||0;
-  document.getElementById('outN').textContent = `元本 ${fmtMoney(total)} / 評価額 ${fmtMoney(last)} / 利益 ${fmtMoney(last-total)}`;
-  drawLine(document.getElementById('chartN'), arr, ["開始","終了"]);
-});
-
-document.getElementById('runC').addEventListener('click', ()=>{
-  const m=+document.getElementById('pmtC').value||0;
-  const r=+document.getElementById('retC').value||0;
-  const y=+document.getElementById('yrsC').value||0;
-  const vol=+document.getElementById('volC').value||0;
-  const arr = runDCA(m,y,r,vol);
-  const total = m * Math.round(y*12);
-  const last = arr[arr.length-1]||0;
-  document.getElementById('outC').textContent = `元本 ${fmtMoney(total)} / 評価額 ${fmtMoney(last)} / 利益 ${fmtMoney(last-total)}`;
-  drawLine(document.getElementById('chartC'), arr, ["開始","終了"]);
-});
-
-/* ========= Quiz ========= */
-const QA = [
-  {q:"NISAで基本的に狙うべき方針はどれ？", a:["短期売買で利益確定","長期・分散・低コスト","一点集中で大勝ち"], c:1},
-  {q:"DCA（ドルコスト平均法）の説明で正しいのは？", a:["毎月一定額を買う","最安の日だけ買う","ボーナスの時だけ買う"], c:0},
-  {q:"高ボラ資産に対する姿勢として適切なのは？", a:["資産の大半を入れる","借金して全力","上限割合を決め少額で"], c:2},
-  {q:"生活防衛資金として適切なのは？", a:["1週間分","3〜6か月分","10年分"], c:1},
-  {q:"手数料が同じなら、分散が広い商品は？", a:["単一銘柄","テーマ特化ETF","全世界インデックス"], c:2},
-];
-function renderQuiz(){
-  const box=document.getElementById('quizBox'); box.innerHTML="";
-  QA.forEach((it,i)=>{
-    const div=document.createElement('div'); div.className="quiz-q";
-    div.innerHTML = `<div>${i+1}. ${it.q}</div>` + it.a.map((t,j)=>`<label class="opt"><input type="radio" name="q${i}" value="${j}"> ${t}</label>`).join("");
-    box.appendChild(div);
-  });
-}
-document.getElementById('grade').addEventListener('click', ()=>{
-  let score=0; QA.forEach((it,i)=>{ const v = document.querySelector(`input[name="q${i}"]:checked`); if(v && +v.value===it.c) score++; });
-  document.getElementById('score').textContent = `正解：${score}/${QA.length}点`;
-});
-renderQuiz();
-
-/* ========= PWA SW ========= */
-if('serviceWorker' in navigator){ window.addEventListener('load', ()=> navigator.serviceWorker.register('./sw.js').catch(console.error)); }
-</script>
-</body>
-</html>
+    const shock = vol>
