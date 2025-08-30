@@ -2,8 +2,8 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>師匠アプリ v1.2 — 投資チャット & シミュレーター</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>師匠アプリ v1.3 — 投資チャット / シミュ / クイズ</title>
 <meta name="theme-color" content="#0b0f14" />
 <style>
 :root{--bg:#0b0f14;--panel:#111824;--soft:#0e1520;--text:#e8f0ff;--muted:#9fb3c8;--accent:#5ad1ff;--accent2:#7cffc2;--border:#233043;--ok:#64f4a3;--warn:#ffd36e;--bad:#ff6b6b}
@@ -11,36 +11,43 @@
 header{position:sticky;top:0;z-index:10;padding:14px 16px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(90,209,255,.08),rgba(124,255,194,.05))}
 h1{margin:0;font-size:clamp(18px,3.2vw,28px)} .sub{color:var(--muted);font-size:12px}
 .container{max-width:1100px;margin:0 auto;padding:16px}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px}
-.tab{padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:var(--soft);cursor:pointer}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab{padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:var(--soft);cursor:pointer;flex:0 0 auto}
 .tab.active{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#001018;border-color:transparent}
 .panel{display:none} .panel.active{display:block}
 .card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
 input,select,button{background:var(--soft);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px}
-button{cursor:pointer;border:1px solid transparent;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#001018;font-weight:700}
+button{cursor:pointer;border:1px solid transparent;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#001018;font-weight:700;min-height:44px;border-radius:12px}
 button.secondary{background:transparent;color:var(--text);border-color:var(--border)}
 .small{font-size:12px;color:var(--muted)} .tag{padding:2px 8px;border:1px solid var(--border);border-radius:999px;font-size:12px;color:var(--muted);display:inline-block}
 .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid var(--border)}
 hr{border:0;border-top:1px dashed var(--border);margin:10px 0}
-
 /* Chat */
-.chat-wrap{display:grid;grid-template-rows:1fr auto;gap:10px;height:min(68vh,620px)}
+.chat-wrap{display:grid;grid-template-rows:1fr auto;gap:10px;height:calc(var(--vh, 1vh)*70)}
 .msgs{overflow:auto;padding-right:4px}
 .msg{display:flex;gap:10px;margin:10px 0}
 .bubble{max-width:80%;padding:10px 12px;border-radius:14px;border:1px solid var(--border);background:var(--soft)}
 .me .bubble{margin-left:auto;background:#112235}
 .sensei .bubble{background:#0f1d24}
 .quick{display:flex;gap:6px;flex-wrap:wrap}
-.quick button{padding:6px 10px}
-
+.quick button{padding:8px 10px}
 /* Chart */
 canvas{width:100%;height:260px;background:var(--soft);border:1px solid var(--border);border-radius:12px;display:block}
+/* Mobile */
+@media (max-width:520px){
+  body{font-size:15px}
+  header{padding:12px} .container{padding:12px}
+  .card{padding:12px;border-radius:12px} .row{gap:8px}
+  input,select,button{padding:12px;font-size:16px}
+  #chat .card>div:last-child{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(11,15,20,0),rgba(11,15,20,.85));padding-bottom:max(8px,env(safe-area-inset-bottom))}
+  canvas{height:220px}
+}
 </style>
 </head>
 <body>
 <header>
-  <h1>師匠アプリ v1.2 <span class="badge">投資チャット</span> <span class="badge">シミュレーター</span></h1>
+  <h1>師匠アプリ v1.3 <span class="badge">投資チャット</span> <span class="badge">シミュ</span> <span class="badge">クイズ</span></h1>
   <div class="sub">教育目的の一般情報。特定銘柄の推奨は行いません。</div>
 </header>
 
@@ -48,6 +55,7 @@ canvas{width:100%;height:260px;background:var(--soft);border:1px solid var(--bor
   <div class="tabs">
     <div class="tab active" data-tab="chat">💬 チャット</div>
     <div class="tab" data-tab="sim">📊 シミュレーター</div>
+    <div class="tab" data-tab="quiz">🧪 クイズ</div>
     <div class="tab" data-tab="profile">👤 プロフィール</div>
   </div>
 
@@ -57,15 +65,15 @@ canvas{width:100%;height:260px;background:var(--soft);border:1px solid var(--bor
       <div id="msgs" class="msgs"></div>
       <div>
         <div class="quick">
-          <button class="secondary q">今なら何を買えばいい？</button>
-          <button class="secondary q">初心者は何から始めるべき？</button>
+          <button class="secondary q">初心者は何から始める？</button>
           <button class="secondary q">攻めたい時の配分は？</button>
+          <button class="secondary q">配当重視だと？</button>
         </div>
         <div class="row" style="margin-top:8px">
-          <input id="chatInput" placeholder="師匠に質問を書く（例：今買うなら何？/攻めたい）" style="flex:1" autocomplete="off" enterkeyhint="send">
+          <input id="chatInput" placeholder="今買うなら何？/初心者/攻めたい/配当など" style="flex:1" autocomplete="off" enterkeyhint="send">
           <button id="sendBtn">送信</button>
         </div>
-        <div class="small">※ 回答はカテゴリ提案（インデックスETF/グロース/高配当など）で返します。</div>
+        <div class="small">※ 回答はカテゴリ提案（インデックス/配当/グロース）でテキスト表示。</div>
       </div>
     </div>
   </section>
@@ -75,13 +83,23 @@ canvas{width:100%;height:260px;background:var(--soft);border:1px solid var(--bor
     <div class="card">
       <h2 style="margin:0 0 8px">NISA / 積立シミュレーター</h2>
       <div class="row">
-        <div><label>毎月の積立(円)</label><input id="pmt" type="number" value="30000"></div>
-        <div><label>年率(%)</label><input id="ret" type="number" value="5"></div>
-        <div><label>年数</label><input id="yrs" type="number" value="10"></div>
+        <div><label>毎月(円)</label><input id="pmt" type="number" inputmode="numeric" value="30000"></div>
+        <div><label>年率(%)</label><input id="ret" type="number" inputmode="decimal" value="5"></div>
+        <div><label>年数</label><input id="yrs" type="number" inputmode="numeric" value="10"></div>
         <button id="runSim" class="secondary">計算</button>
       </div>
       <div class="row" style="margin-top:6px"><div class="tag" id="outSim"></div></div>
       <canvas id="chartSim"></canvas>
+    </div>
+  </section>
+
+  <!-- Quiz -->
+  <section id="quiz" class="panel">
+    <div class="card">
+      <h2 style="margin:0 0 6px">ミニクイズ（5問）</h2>
+      <div id="quizBox"></div>
+      <button id="grade" class="secondary">採点する</button>
+      <div id="score" class="tag" style="margin-top:8px"></div>
     </div>
   </section>
 
@@ -90,9 +108,9 @@ canvas{width:100%;height:260px;background:var(--soft);border:1px solid var(--bor
     <div class="card">
       <h2 style="margin:0 0 6px">プロフィール（回答に反映）</h2>
       <div class="row">
-        <div><label>年齢</label><input id="age" type="number" value="20"></div>
-        <div><label>投資期間（年）</label><input id="horizon" type="number" value="10"></div>
-        <div><label>毎月の投資余力（円）</label><input id="budget" type="number" value="10000"></div>
+        <div><label>年齢</label><input id="age" type="number" inputmode="numeric" value="20"></div>
+        <div><label>投資期間（年）</label><input id="horizon" type="number" inputmode="numeric" value="10"></div>
+        <div><label>毎月の投資余力（円）</label><input id="budget" type="number" inputmode="numeric" value="10000"></div>
         <div><label>リスク許容度</label>
           <select id="risk"><option>低</option><option selected>中</option><option>高</option></select>
         </div>
@@ -104,19 +122,21 @@ canvas{width:100%;height:260px;background:var(--soft);border:1px solid var(--bor
 </div>
 
 <script>
-/* ========= Tabs ========= */
+/* ===== 100vh補正（スマホ） ===== */
+(function setVh(){ const set=()=>document.documentElement.style.setProperty('--vh', `${window.innerHeight*0.01}px`); set(); addEventListener('resize',set); addEventListener('orientationchange',set); })();
+
+/* ===== Tabs ===== */
 document.querySelectorAll('.tab').forEach(t=>{
   t.addEventListener('click',()=>{
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-    t.classList.add('active');
-    document.getElementById(t.dataset.tab).classList.add('active');
+    t.classList.add('active'); document.getElementById(t.dataset.tab).classList.add('active');
   });
 });
 
-/* ========= Profile ========= */
-const PK='mentor_profile_v12';
-let PROF = JSON.parse(localStorage.getItem(PK) || '{"age":20,"horizon":10,"budget":10000,"risk":"中"}');
+/* ===== Profile ===== */
+const PK='mentor_profile_v13';
+let PROF = JSON.parse(localStorage.getItem(PK)||'{"age":20,"horizon":10,"budget":10000,"risk":"中"}');
 function saveProf(){ localStorage.setItem(PK, JSON.stringify(PROF)); showProf(); }
 function showProf(){ document.getElementById('profOut').textContent = `年齢:${PROF.age} / 期間:${PROF.horizon}年 / 余力:¥${(+PROF.budget).toLocaleString()} / リスク:${PROF.risk}`; }
 ['age','horizon','budget','risk'].forEach(id=> document.getElementById(id).value = PROF[id]);
@@ -126,115 +146,100 @@ document.getElementById('saveProf').addEventListener('click', ()=>{
   PROF.budget=+document.getElementById('budget').value||0;
   PROF.risk=document.getElementById('risk').value||'中';
   saveProf();
-});
-showProf();
+}); showProf();
 
-/* ========= Chat ========= */
+/* ===== Chat（カテゴリ文字で返答） ===== */
 const msgs = document.getElementById('msgs');
-function addMsg(role, html){
-  const wrap=document.createElement('div');
-  wrap.className='msg '+(role==='me'?'me':'sensei');
-  const bub=document.createElement('div');
-  bub.className='bubble';
-  bub.innerHTML=html;
-  wrap.appendChild(bub);
-  msgs.appendChild(wrap);
-  msgs.scrollTop=msgs.scrollHeight;
-}
-// 金額の整形
 const yen = n => '¥'+Math.round(n).toLocaleString('ja-JP');
-
-// カテゴリ提案テキストを生成（インデックス/配当/グロースを「文字で」返す）
+function addMsg(role, html){
+  const wrap=document.createElement('div'); wrap.className='msg '+(role==='me'?'me':'sensei');
+  const b=document.createElement('div'); b.className='bubble'; b.innerHTML=html; wrap.appendChild(b);
+  msgs.appendChild(wrap); msgs.scrollTop=msgs.scrollHeight;
+}
 function categoryAdvice(question){
   const {horizon,budget,risk}=PROF;
-  // 目安の配分（リスクと期間でざっくり）
-  let beginner = {idx:100, div:0, gro:0};
-  let normal   = {idx:75,  div:15, gro:10};
-  let attack   = {idx:60,  div:20, gro:20};
+  let beginner={idx:100,div:0,gro:0}, normal={idx:75,div:15,gro:10}, attack={idx:60,div:20,gro:20};
   if(risk==='低'){ normal={idx:85,div:10,gro:5}; attack={idx:70,div:20,gro:10}; }
   if(risk==='高'){ normal={idx:65,div:10,gro:25}; attack={idx:50,div:15,gro:35}; }
   if(horizon<3){ beginner={idx:100,div:0,gro:0}; normal={idx:90,div:10,gro:0}; attack={idx:80,div:20,gro:0}; }
-
-  function block(title, pct){
-    const i = Math.round((budget||0)*pct.idx/100);
-    const d = Math.round((budget||0)*pct.div/100);
-    const g = Math.round((budget||0)*pct.gro/100);
-    return `<div class="card" style="margin:8px 0;background:rgba(90,209,255,.04)">
+  const block=(title,p)=>`
+    <div class="card" style="margin:8px 0;background:rgba(90,209,255,.04)">
       <div><b>${title}</b></div>
       <ul class="small">
-        <li>インデックスETF（広く分散・低コスト）: <b>${pct.idx}%</b>${budget?` → ${yen(i)}/月`:''}</li>
-        <li>配当・ディフェンシブ: <b>${pct.div}%</b>${budget?` → ${yen(d)}/月`:''}</li>
-        <li>グロース/テーマ（攻め）: <b>${pct.gro}%</b>${budget?` → ${yen(g)}/月`:''}</li>
+        <li>インデックスETF：<b>${p.idx}%</b>${budget?` → ${yen(budget*p.idx/100)}/月`:''}</li>
+        <li>配当/ディフェンシブ：<b>${p.div}%</b>${budget?` → ${yen(budget*p.div/100)}/月`:''}</li>
+        <li>グロース/テーマ：<b>${p.gro}%</b>${budget?` → ${yen(budget*p.gro/100)}/月`:''}</li>
       </ul>
-      <div class="small">買い方：毎月同額のDCA。まとまって買うなら <b>3分割</b>（例：${budget?yen((budget/3)): '月額を3分割'}）。</div>
+      <div class="small">買い方：毎月同額DCA。まとまって買うなら<b>3分割</b>。</div>
     </div>`;
-  }
-
-  // キーワードでプリセット切替
-  const q = question.toLowerCase();
-  let preface = `<div class="small">前提: 期間<strong>${horizon}年</strong> / 月<strong>${yen(budget||0)}</strong> / リスク<strong>${risk}</strong></div><hr>`;
-  if(/初心者|はじめ|何から/.test(q)){
-    return preface + `<b>結論：</b>まずは <b>インデックスETF</b> を軸にコツコツ。` + block('初心者向け（まずはコレ）', beginner);
-  }
-  if(/攻め|リスクを取る|グロース/.test(q)){
-    return preface + `<b>結論：</b>攻めるなら <b>グロースを20%前後</b>まで。入れすぎ注意。` + block('攻め（値動きOKなら）', attack);
-  }
-  if(/配当|安定|守り|ディフェンシブ/.test(q)){
-    return preface + `<b>結論：</b>安定重視なら <b>配当・ディフェンシブ比率を上げる</b>。` + block('守り寄り（配当重視）', {idx:80,div:20,gro:0});
-  }
-  // デフォルトは3パターン提示
-  return preface + `<b>今日の結論（3パターン）：</b>` + block('初心者向け（まずはコレ）', beginner)
-       + block('標準（ちょい攻め）', normal)
-       + block('攻め（値動きOKなら）', attack)
-       + `<div class="small">注：これはカテゴリ提案。銘柄指定や投資助言ではありません。</div>`;
+  const pre = `<div class="small">前提: 期間<strong>${horizon}年</strong> / 月<strong>${yen(budget||0)}</strong> / リスク<strong>${risk}</strong></div><hr>`;
+  const q=question.toLowerCase();
+  if(/初心者|はじめ|何から/.test(q)) return pre+`<b>結論：</b>初心者は<b>インデックスETF</b>を軸に。`+block('初心者向け', beginner);
+  if(/攻め|リスク|グロース/.test(q)) return pre+`<b>結論：</b>攻めたいなら<b>グロースを20%前後</b>（入れすぎ注意）。`+block('攻め（値動きOK）', attack);
+  if(/配当|安定|守り/.test(q))   return pre+`<b>結論：</b>安定/配当重視。`+block('守り寄り', {idx:80,div:20,gro:0});
+  return pre+`<b>今日の結論（3パターン）：</b>`+block('初心者向け', beginner)+block('標準（ちょい攻め）', normal)+block('攻め（値動きOK）', attack)
+         +`<div class="small">※カテゴリ提案。銘柄指定や投資助言ではありません。</div>`;
 }
-
-function send(text){
-  addMsg('me', text);
-  setTimeout(()=> addMsg('sensei', categoryAdvice(text)), 120);
-}
-
-// IME対応：Enter送信 / 変換中は送らない
-const inputEl=document.getElementById('chatInput');
-let composing=false;
+function send(text){ addMsg('me',text); setTimeout(()=>addMsg('sensei', categoryAdvice(text)), 120); }
+const inputEl=document.getElementById('chatInput'); let composing=false;
 inputEl.addEventListener('compositionstart',()=>composing=true);
 inputEl.addEventListener('compositionend', ()=>composing=false);
 inputEl.addEventListener('keydown',e=>{
   if(e.key==='Enter' && !e.shiftKey){
-    if(composing || e.isComposing) return;
-    e.preventDefault();
-    const v=inputEl.value.trim();
-    if(v) send(v);
-    inputEl.value='';
+    if(composing || e.isComposing) return; e.preventDefault();
+    const v=inputEl.value.trim(); if(v) send(v); inputEl.value='';
   }
 });
-document.getElementById('sendBtn').addEventListener('click',()=>{
-  const v=inputEl.value.trim();
-  if(v) send(v);
-  inputEl.value='';
-});
+document.getElementById('sendBtn').addEventListener('click',()=>{ const v=inputEl.value.trim(); if(v) send(v); inputEl.value=''; });
 document.querySelectorAll('.q').forEach(b=> b.addEventListener('click',()=> send(b.textContent)));
-addMsg('sensei','ようラス。質問を投げたら、<b>インデックス/配当/グロース</b>のカテゴリで具体的な配分（円まで）を返すで。');
+addMsg('sensei','よう。質問くれたら <b>インデックス/配当/グロース</b>で配分（円まで）を返すで。');
 
-/* ========= Simulator ========= */
-function runDCA(monthly, yrs, annual){
-  const n=Math.max(1,Math.round(yrs*12)); const r=(annual/100)/12; let v=0, arr=[];
-  for(let i=1;i<=n;i++){ v=(v+monthly)*(1+r); arr.push(Math.round(v)); }
-  return arr;
-}
-function drawChart(canvas, series){
-  const ctx=canvas.getContext('2d'); const DPR=window.devicePixelRatio||1;
-  const W=canvas.clientWidth, H=canvas.clientHeight; canvas.width=W*DPR; canvas.height=H*DPR; ctx.scale(DPR,DPR);
-  ctx.clearRect(0,0,W,H);
+/* ===== Simulator ===== */
+function runDCA(m,yrs,annual){ const n=Math.max(1,Math.round(yrs*12)); const r=(annual/100)/12; let v=0,arr=[]; for(let i=1;i<=n;i++){ v=(v+m)*(1+r); arr.push(Math.round(v)); } return arr; }
+function drawChart(c,series){
+  const ctx=c.getContext('2d'), DPR=window.devicePixelRatio||1, W=c.clientWidth, H=c.clientHeight;
+  c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR); ctx.clearRect(0,0,W,H);
   const pad=36, maxY=Math.max(...series)*1.05||1;
   ctx.strokeStyle="#233043"; ctx.beginPath(); ctx.moveTo(pad,H-pad); ctx.lineTo(W-pad,H-pad); ctx.lineTo(W-pad,pad); ctx.stroke();
   ctx.fillStyle="#9fb3c8"; ctx.font="12px system-ui";
-  for(let t=0;t<=4;t++){ const y=H-pad-(H-2*pad)*t/4; const val=Math.round(maxY*t/4); ctx.fillText(val.toLocaleString('ja-JP'),6,y+4); ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.strokeStyle="#233043"; ctx.stroke();}
+  for(let t=0;t<=4;t++){ const y=H-pad-(H-2*pad)*t/4; const v=Math.round(maxY*t/4); ctx.fillText(v.toLocaleString('ja-JP'),6,y+4); ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.strokeStyle="#233043"; ctx.stroke(); }
   ctx.beginPath(); series.forEach((v,i)=>{ const x=pad+(W-2*pad)*i/(series.length-1); const y=H-pad-(H-2*pad)*(v/maxY); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
   ctx.strokeStyle="#7aa2ff"; ctx.lineWidth=2; ctx.stroke();
 }
 document.getElementById('runSim').addEventListener('click',()=>{
-  const m=+document.getElementById('pmt').value||0;
-  const r=+document.getElementById('ret').value||0;
-  const y=+document.getElementById('yrs').value||0;
-  const arr=runDCA(m,y,r); const
+  const m=+document.getElementById('pmt').value||0, r=+document.getElementById('ret').value||0, y=+document.getElementById('yrs').value||0;
+  const arr=runDCA(m,y,r), last=arr[arr.length-1]||0, principal=m*Math.round(y*12);
+  document.getElementById('outSim').textContent=`元本 ${yen(principal)} / 評価額 ${yen(last)} / 利益 ${yen(last-principal)}`;
+  drawChart(document.getElementById('chartSim'), arr);
+});
+
+/* ===== Quiz ===== */
+const QA=[
+ {q:"NISAで基本的に狙うべきは？",a:["短期売買","長期・分散・低コスト","一点集中"],c:1},
+ {q:"DCAとは？",a:["毎月一定額で買う","最安の日だけ買う","高配当だけ買う"],c:0},
+ {q:"高ボラ資産の姿勢は？",a:["資産の大半を入れる","借金して全力","上限割合を決め少額で"],c:2},
+ {q:"生活防衛資金の目安は？",a:["1週間分","3〜6か月分","10年分"],c:1},
+ {q:"分散が広いのは？",a:["単一銘柄","テーマ特化","全世界インデックス"],c:2},
+];
+function renderQuiz(){
+  const box=document.getElementById('quizBox'); box.innerHTML="";
+  QA.forEach((it,i)=>{
+    const div=document.createElement('div'); div.className="quiz-q";
+    div.innerHTML=`<div>${i+1}. ${it.q}</div>`+it.a.map((t,j)=>`<label class="opt"><input type="radio" name="q${i}" value="${j}"> ${t}</label>`).join("");
+    box.appendChild(div);
+  });
+}
+document.getElementById('grade').addEventListener('click',()=>{
+  let score=0; QA.forEach((it,i)=>{ const v=document.querySelector(`input[name="q${i}"]:checked`); if(v&&+v.value===it.c) score++; });
+  document.getElementById('score').textContent=`正解：${score}/${QA.length} 点`;
+});
+renderQuiz();
+
+/* ===== フォーカス時に隠れないようスクロール ===== */
+['chatInput','pmt','ret','yrs','age','horizon','budget'].forEach(id=>{
+  const el=document.getElementById(id); if(!el) return;
+  el.addEventListener('focus', ()=> setTimeout(()=> el.scrollIntoView({block:'end',behavior:'smooth'}), 120));
+});
+</script>
+</body>
+</html>
