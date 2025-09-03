@@ -76,6 +76,38 @@ canvas{width:100%;height:260px;background:var(--soft);border:1px solid var(--bor
         <div class="small">※ 回答はカテゴリ提案（インデックス/配当/グロース）でテキスト表示。</div>
       </div>
     </div>
+
+    <!-- === 師匠GPTチャット（ウィジェット） === -->
+    <style>
+      #mentorBox{max-width:860px;margin:20px auto;padding:12px;border:1px solid #223246;border-radius:12px;background:#101826;color:#e8f0ff;font-family:system-ui,Segoe UI,Roboto,"Noto Sans JP",sans-serif}
+      #mentorMsgs{display:flex;flex-direction:column;gap:8px;max-height:52vh;overflow:auto;margin:8px 0}
+      .mb{padding:10px 12px;border:1px solid #223246;border-radius:12px;background:#0f1d24;max-width:80%}
+      .me .mb{margin-left:auto;background:#112235}
+      #mentorBox input,#mentorBox select,#mentorBox button{background:#0f1623;color:#e8f0ff;border:1px solid #223246;border-radius:10px;padding:10px}
+      #mentorBox button{background:linear-gradient(90deg,#5ad1ff,#7cffc2);color:#001018;font-weight:700;border:none;min-height:40px}
+      #mentorRow{display:flex;gap:8px;align-items:center}
+    </style>
+    <div id="mentorBox">
+      <div style="font-weight:700;margin-bottom:6px">💬 師匠GPT（投資Q&A）</div>
+      <div style="font-size:12px;color:#9fb3c8">教育目的。特定銘柄の推奨ではありません。</div>
+
+      <div style="margin:8px 0;font-size:12px;color:#9fb3c8">
+        期間(年) <input id="mh" type="number" value="10" style="width:6em">
+        月余力(円) <input id="mb" type="number" value="10000" style="width:8em">
+        リスク
+        <select id="mr">
+          <option>低</option><option selected>中</option><option>高</option>
+        </select>
+      </div>
+
+      <div id="mentorMsgs"></div>
+
+      <div id="mentorRow">
+        <input id="mq" placeholder="例: 初心者は何から始める？" style="flex:1">
+        <button id="msend">送信</button>
+      </div>
+    </div>
+    <!-- /師匠GPTチャット -->
   </section>
 
   <!-- Simulator -->
@@ -160,7 +192,7 @@ function addMsg(role, html){
 function categoryAdvice(question){
   const {horizon,budget,risk}=PROF;
 
-  // 1) 文字正規化（全角→半角、句読点・空白除去）
+  // 1) 文字正規化
   const norm = (s)=>
     s.normalize('NFKC')
      .replace(/[！!？?\s]/g,'')
@@ -168,12 +200,12 @@ function categoryAdvice(question){
 
   const q = norm(question);
 
-  // 2) 意図判定（幅広い言い回しをカバー）
+  // 2) 意図判定
   const isBeginner = /(初心者|はじめ|初めて|入門|何から|むずい|難しい|楽に|簡単に)/.test(q);
   const isAttack   = /(攻め|強気|グロース|成長|リスク取|一発|倍|跳ね|テーマ)/.test(q);
   const isDividend = /(配当|利回り|ディフェンシブ|守り|安定|高配当|インカム)/.test(q);
 
-  // 3) 配分プリセット（リスク・期間で微調整）
+  // 3) 配分プリセット
   let beginner={idx:100,div:0,gro:0},
       normal  ={idx:75, div:15,gro:10},
       attack  ={idx:60, div:20,gro:20};
@@ -196,7 +228,6 @@ function categoryAdvice(question){
 
   const pre = `<div class="small">前提: 期間<strong>${horizon}年</strong> / 月<strong>${yen(budget||0)}</strong> / リスク<strong>${risk}</strong></div><hr>`;
 
-  // 4) 意図に応じて分岐
   if(isBeginner){
     return pre + `<b>結論：</b>初心者は<b>インデックスETF</b>を軸に。` + block('初心者向け', beginner);
   }
@@ -207,7 +238,6 @@ function categoryAdvice(question){
     return pre + `<b>結論：</b>配当・安定重視。` + block('守り寄り（配当重視）', {idx:80,div:20,gro:0});
   }
 
-  // 5) 該当なし → 3パターン提示
   return pre + `<b>今日の結論（3パターン）：</b>`
        + block('初心者向け', beginner)
        + block('標準（ちょい攻め）', normal)
@@ -276,77 +306,51 @@ renderQuiz();
   el.addEventListener('focus', ()=> setTimeout(()=> el.scrollIntoView({block:'end',behavior:'smooth'}), 120));
 });
 </script>
-<!-- === 師匠GPTチャット（簡易ウィジェット） === -->
-<style>
-  #mentorBox{max-width:860px;margin:20px auto;padding:12px;border:1px solid #223246;border-radius:12px;background:#101826;color:#e8f0ff;font-family:system-ui,Segoe UI,Roboto,"Noto Sans JP",sans-serif}
-  #mentorMsgs{display:flex;flex-direction:column;gap:8px;max-height:52vh;overflow:auto;margin:8px 0}
-  .mb{padding:10px 12px;border:1px solid #223246;border-radius:12px;background:#0f1d24;max-width:80%}
-  .me .mb{margin-left:auto;background:#112235}
-  #mentorBox input,#mentorBox select,#mentorBox button{background:#0f1623;color:#e8f0ff;border:1px solid #223246;border-radius:10px;padding:10px}
-  #mentorBox button{background:linear-gradient(90deg,#5ad1ff,#7cffc2);color:#001018;font-weight:700;border:none;min-height:40px}
-  #mentorRow{display:flex;gap:8px;align-items:center}
-</style>
-<div id="mentorBox">
-  <div style="font-weight:700;margin-bottom:6px">💬 師匠GPT（投資Q&A）</div>
-  <div style="font-size:12px;color:#9fb3c8">教育目的。特定銘柄の推奨ではありません。</div>
 
-  <div style="margin:8px 0;font-size:12px;color:#9fb3c8">
-    期間(年) <input id="mh" type="number" value="10" style="width:6em">
-    月余力(円) <input id="mb" type="number" value="10000" style="width:8em">
-    リスク
-    <select id="mr">
-      <option>低</option><option selected>中</option><option>高</option>
-    </select>
-  </div>
-
-  <div id="mentorMsgs"></div>
-
-  <div id="mentorRow">
-    <input id="mq" placeholder="例: 初心者は何から始める？" style="flex:1">
-    <button id="msend">送信</button>
-  </div>
-</div>
+<!-- === 師匠GPTウィジェット用スクリプト（エンドポイント=/ask） === -->
 <script>
-const WORKER_URL = "https://rs.＜あなたのアカウント＞.workers.dev/api/chat"; // ← デプロイで出たURLに置換
-const msgs = document.getElementById("mentorMsgs");
-const q    = document.getElementById("mq");
-const btn  = document.getElementById("msend");
+  const WORKER_URL = "https://rs.michinari-f.workers.dev/ask"; // ← あなたのWorker
 
-function add(role, html){
-  const w=document.createElement("div");
-  w.className = role==="me" ? "me" : "ai";
-  const b=document.createElement("div");
-  b.className="mb"; b.innerHTML=html;
-  w.appendChild(b); msgs.appendChild(w); msgs.scrollTop=msgs.scrollHeight;
-}
+  // 既存の msgs と衝突しない名前に
+  const mMsgs = document.getElementById("mentorMsgs");
+  const q    = document.getElementById("mq");
+  const btn  = document.getElementById("msend");
 
-async function ask(){
-  const text = q.value.trim(); if(!text) return;
-  add("me", text); q.value="";
-
-  const profile = {
-    horizon: +document.getElementById("mh").value||null,
-    budget:  +document.getElementById("mb").value||null,
-    risk:     document.getElementById("mr").value||"中",
-  };
-
-  try{
-    const res = await fetch(WORKER_URL, {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ message:text, profile })
-    });
-    const json = await res.json();
-    add("ai", json.reply || "（応答なし）");
-  }catch(e){
-    add("ai", "接続エラー。時間をおいて再試行してください。");
-    console.error(e);
+  function mAdd(role, html){
+    const w=document.createElement("div");
+    w.className = role==="me" ? "me" : "ai";
+    const b=document.createElement("div");
+    b.className="mb"; b.innerHTML=html;
+    w.appendChild(b); mMsgs.appendChild(w); mMsgs.scrollTop=mMsgs.scrollHeight;
   }
-}
-btn.addEventListener("click", ask);
-q.addEventListener("keydown", e=>{ if(e.key==="Enter") ask(); });
-</script>
-<!-- === /師匠GPTチャット === -->
 
+  async function ask(){
+    const text = q.value.trim(); if(!text) return;
+    mAdd("me", text); q.value="";
+
+    const profile = {
+      horizon: +document.getElementById("mh").value||null,
+      budget:  +document.getElementById("mb").value||null,
+      risk:     document.getElementById("mr").value||"中",
+    };
+
+    try{
+      const res = await fetch(WORKER_URL, {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ question: text, profile }) // /ask は question を期待
+      });
+      const json = await res.json();
+      mAdd("ai", json.reply || "（応答なし）");
+    }catch(e){
+      console.error(e);
+      mAdd("ai", "接続エラー。時間をおいて再試行してください。");
+    }
+  }
+
+  btn.addEventListener("click", ask);
+  q.addEventListener("keydown", e=>{ if(e.key==="Enter") ask(); });
+</script>
+<!-- === /師匠GPTウィジェット === -->
 </body>
 </html>
